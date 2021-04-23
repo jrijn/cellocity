@@ -1,12 +1,13 @@
 from cellocity.channel import Channel
 import tifffile
 import os
+import statistics
 
-my_filename = "2_channel_micromanager_timelapse.ome.tif"
+my_filename = "D:\EXP-21-BT0430\ome\ENR_MSS109_1_MMStack_Default.ome.tif"
 chToAnalyze = 0  # 0-based indexing of channels
 
 #safely load file
-with tifffile.TiffFile(my_filename, multifile=False) as tif:
+with tifffile.TiffFile(my_filename, multifile=True) as tif:
 
     #strips ome.tif from filename
     label = my_filename.split(".")[0]
@@ -29,8 +30,9 @@ with tifffile.TiffFile(my_filename, multifile=False) as tif:
         "Intended dimensions: frame interval {:.2f}s, {:.2f} frames/min, pixel size: {:.2f} um ".format(
             finterval_s, frames_per_min, Ch0.pxSize_um))
 
-    actual_interval = Ch0.getActualFrameIntevals_ms().mean() / 1000)
-    print("Actual frame interval is: {:.2f} s".format(actual_interval)
+    actual_interval = (statistics.mean(Ch0.getActualFrameIntevals_ms()) / 1000)
+    print("Actual frame interval is: {:.2f} s".format(actual_interval))
+    print(Ch0.getActualFrameIntevals_ms())
 
     intervalOk = Ch0.doFrameIntervalSanityCheck()
 
@@ -46,7 +48,7 @@ with tifffile.TiffFile(my_filename, multifile=False) as tif:
 
     print(
         "Using dimensions: frame interval {:.2f}s, {:.2f} frames/min, pixel size: {:.2f} um. Output unit: {}".format(
-            finterval_s, frames_per_min, Ch0.pxSize_um, unit))
+            finterval_s, frames_per_min, Ch0.pxSize_um, tunit))
 
     print("Start median filter of Channel 1...")
     Ch0.getTemporalMedianFilterArray()
