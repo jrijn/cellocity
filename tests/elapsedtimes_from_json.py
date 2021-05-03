@@ -31,6 +31,15 @@ def meanfinterval(jdata, findkey = "ElapsedTime-ms"):
     return statistics.mean(outdiff)
 
 
+def medianfinterval(jdata, findkey = "ElapsedTime-ms"):
+    keys = list(jdata.keys())
+    out = []
+    for key in keys:
+            if findkey in jdata[key].keys(): out.append(jdata[key][findkey])
+    outdiff = [j-i for i, j in zip(out[:-1], out[1:])]
+    return statistics.median(outdiff)
+
+
 def main():
     files = readdirfiles("E:\EXP-21-BT0437")
     out = {}
@@ -39,8 +48,10 @@ def main():
             jdata = json.loads(open(file).read())
             filename = jdata['Summary']['Prefix']
             meantime = meanfinterval(jdata)
+            mediantime = medianfinterval(jdata)
+            percVariance = ((meantime-mediantime)/meantime)*100
             out[filename] = meantime
-            print("{} : {}".format(filename, meantime))
+            print("{} : {}, {}, {}%".format(filename, round(meantime, 2), round(mediantime, 2), round(percVariance, 2)))
     # print(out)
 
 
